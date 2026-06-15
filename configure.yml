@@ -1,0 +1,26 @@
+---
+- name: Inject Infrastructure Outputs
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Load Terraform outputs
+      ansible.builtin.include_vars:
+        file: ./outputs.json
+        name: tf
+
+    - name: Generate US Config
+      ansible.builtin.template:
+        src: ./app.conf.j2
+        dest: ./config/us-app.conf
+        vars:
+          bucket_arn: "{{ tf.us_bucket_arn }}"
+          region_name: "US-East"
+
+    - name: Generate EU Config
+      ansible.builtin.template:
+        src: ./app.conf.j2
+        dest: ./config/eu-app.conf
+        vars:
+          bucket_arn: "{{ tf.eu_bucket_arn }}"
+          region_name: "EU-West"
